@@ -13,4 +13,4 @@ RUN chmod +x ./gradlew
 RUN ./gradlew clean bootJar --no-daemon
 
 # Run jar dynamically binding to Railway PORT
-CMD ["sh", "-c", "java -Dserver.port=${PORT:8080} -jar build/libs/*.jar"]
+CMD ["sh", "-c", "java -jar build/libs/*.jar"]
