@@ -1,15 +1,14 @@
 package com.fruito.backend.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Base64;
+import java.util.Map;
 
 /**
  * CloudinaryService — uploads images via Cloudinary REST API.
@@ -33,8 +32,22 @@ public class CloudinaryService {
     @Value("${cloudinary.api-secret:NOT_SET}")
     private String apiSecret;
 
+    private Cloudinary cloudinary;
+
+    @PostConstruct
+    public void init() {
+        if (!"NOT_SET".equals(cloudName)) {
+            cloudinary = new Cloudinary(ObjectUtils.asMap(
+                    "cloud_name", cloudName,
+                    "api_key", apiKey,
+                    "api_secret", apiSecret,
+                    "secure", true
+            ));
+        }
+    }
+
     public String uploadFile(MultipartFile file) throws IOException {
-        if ("NOT_SET".equals(cloudName)) {
+        if (cloudinary == null) {
             throw new UnsupportedOperationException(
                 "Cloudinary credentials not configured. " +
                 "Set cloudinary.cloud-name, cloudinary.api-key, cloudinary.api-secret " +
@@ -42,51 +55,12 @@ public class CloudinaryService {
             );
         }
 
-        // Use Cloudinary unsigned upload REST API
-        String uploadUrl = "https://api.cloudinary.com/v1_1/" + cloudName + "/image/upload";
-        String auth = Base64.getEncoder().encodeToString((apiKey + ":" + apiSecret).getBytes());
-        String boundary = "----FormBoundary" + System.currentTimeMillis();
-
-        byte[] fileBytes = file.getBytes();
-        String contentType = file.getContentType() != null ? file.getContentType() : "application/octet-stream";
-        String originalName = file.getOriginalFilename() != null ? file.getOriginalFilename() : "upload";
-
-        // Build multipart body manually
-        String header = "--" + boundary + "\r\n" +
-                        "Content-Disposition: form-data; name=\"file\"; filename=\"" + originalName + "\"\r\n" +
-                        "Content-Type: " + contentType + "\r\n\r\n";
-        String footer = "\r\n--" + boundary + "--\r\n";
-
-        byte[] headerBytes = header.getBytes();
-        byte[] footerBytes = footer.getBytes();
-        byte[] body = new byte[headerBytes.length + fileBytes.length + footerBytes.length];
-        System.arraycopy(headerBytes, 0, body, 0, headerBytes.length);
-        System.arraycopy(fileBytes, 0, body, headerBytes.length, fileBytes.length);
-        System.arraycopy(footerBytes, 0, body, headerBytes.length + fileBytes.length, footerBytes.length);
-
         try {
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(uploadUrl))
-                    .header("Authorization", "Basic " + auth)
-                    .header("Content-Type", "multipart/form-data; boundary=" + boundary)
-                    .POST(HttpRequest.BodyPublishers.ofByteArray(body))
-                    .build();
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            String responseBody = response.body();
-
-            // Parse secure_url from response JSON (simple extraction without external lib)
-            int urlStart = responseBody.indexOf("\"secure_url\":\"");
-            if (urlStart == -1) {
-                throw new IOException("Cloudinary upload failed: " + responseBody);
-            }
-            int start = urlStart + 13;
-            int end = responseBody.indexOf('"', start);
-            return responseBody.substring(start, end);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IOException("Upload interrupted", e);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            return uploadResult.get("secure_url").toString();
+        } catch (Exception e) {
+            throw new IOException("Cloudinary upload failed", e);
         }
     }
 }
