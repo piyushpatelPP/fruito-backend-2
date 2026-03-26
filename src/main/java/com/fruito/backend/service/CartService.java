@@ -43,7 +43,16 @@ public class CartService {
 
     /* ================= API METHODS ================= */
 
+    /** Max items of a single product per cart — prevents quantity manipulation */
+    private static final int MAX_QTY = 99;
+
     public CartResponse addProductByEmail(String email, Long productId, int qty) {
+
+        // ── Quantity guard: block zero, negative, and absurdly large values ──
+        if (qty < 1 || qty > MAX_QTY) {
+            throw new IllegalArgumentException(
+                    "Quantity must be between 1 and " + MAX_QTY);
+        }
 
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -55,23 +64,30 @@ public class CartService {
 
         for (CartItem i : cart.getItems()) {
             if (i.getProduct().getId().equals(productId)) {
-                i.setQuantity(i.getQuantity() + qty);
+                // Cap accumulated quantity to MAX_QTY
+                int newQty = Math.min(i.getQuantity() + qty, MAX_QTY);
+                i.setQuantity(newQty);
                 return toResponse(cart);
             }
         }
 
         cart.getItems().add(new CartItem(cart, fruit, qty));
-
         return toResponse(cart);
     }
 
     public CartResponse updateQuantity(User user, Long productId, int qty) {
 
+        // ── Quantity guard: 0 means remove item; negative/oversized are rejected ──
+        if (qty < 0 || qty > MAX_QTY) {
+            throw new IllegalArgumentException(
+                    "Quantity must be 0 (remove) or between 1 and " + MAX_QTY);
+        }
+
         Cart cart = getOrCreateCart(user);
 
         cart.getItems().removeIf(i -> {
             if (i.getProduct().getId().equals(productId)) {
-                if (qty <= 0) return true;
+                if (qty == 0) return true;   // qty=0 → remove item
                 i.setQuantity(qty);
             }
             return false;

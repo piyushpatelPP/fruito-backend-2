@@ -21,6 +21,14 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    /** Optional — user fills in after registration */
+    @Column(nullable = true)
+    private String phone;
+
+    /** Delivery address — stored and shown to admin on orders */
+    @Column(nullable = true, length = 500)
+    private String address;
+
     // ===== GETTERS & SETTERS =====
 
     public Long getId() {
@@ -50,4 +58,10 @@ public class User {
     public void setRole(Role role) {
         this.role = role;
     }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 }

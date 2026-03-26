@@ -22,8 +22,10 @@ public class MeController {
         User user = userService.getCurrentUser();
 
         return Map.of(
-                "email", user.getEmail(),
-                "role", user.getRole().name()
+                "email",   user.getEmail(),
+                "role",    user.getRole().name(),
+                "phone",   user.getPhone()   != null ? user.getPhone()   : "",
+                "address", user.getAddress() != null ? user.getAddress() : ""
         );
     }
 

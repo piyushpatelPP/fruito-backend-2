@@ -182,6 +182,7 @@ public class OrderService {
     }
 
     // ─── Admin: update delivery date ─────────────────────────────────────────
+    @SuppressWarnings("null")
     public Order setDeliveryDate(Long orderId, LocalDateTime deliveryAt) {
         Order order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
@@ -193,6 +194,7 @@ public class OrderService {
     public List<Order> getUserOrders(User user) { return orderRepo.findByUser(user); }
     public List<Order> getAllOrders() { return orderRepo.findAll(); }
 
+    @SuppressWarnings("null")
     public Order updateStatus(Long id, OrderStatus status) {
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
@@ -234,6 +236,8 @@ public class OrderService {
                 order.getPaymentStatus(),
                 order.getUser().getId(),
                 order.getUser().getEmail(),
+                order.getUser().getPhone(),    // ← delivery contact
+                order.getUser().getAddress(),  // ← delivery address
                 order.getTotalAmount(),
                 order.getCreatedAt().toString(),
                 order.getEstimatedDeliveryAt() != null ? order.getEstimatedDeliveryAt().toString() : null,

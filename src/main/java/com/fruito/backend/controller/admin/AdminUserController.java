@@ -31,6 +31,7 @@ public class AdminUserController {
     }
 
     @DeleteMapping("/{id}")
+    @SuppressWarnings("null")
     public void deleteUser(@PathVariable("id") Long id) {
         userRepository.deleteById(id);
     }

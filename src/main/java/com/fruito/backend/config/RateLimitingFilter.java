@@ -24,13 +24,19 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
     // 10 requests per minute for Auth
     private Bucket createNewAuthBucket() {
-        Bandwidth limit = Bandwidth.simple(10, Duration.ofMinutes(1));
+        Bandwidth limit = Bandwidth.builder()
+                .capacity(10)
+                .refillGreedy(10, Duration.ofMinutes(1))
+                .build();
         return Bucket.builder().addLimit(limit).build();
     }
 
     // 5 requests per minute for Orders
     private Bucket createNewOrderBucket() {
-        Bandwidth limit = Bandwidth.simple(5, Duration.ofMinutes(1));
+        Bandwidth limit = Bandwidth.builder()
+                .capacity(5)
+                .refillGreedy(5, Duration.ofMinutes(1))
+                .build();
         return Bucket.builder().addLimit(limit).build();
     }
 
@@ -39,7 +45,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        String ip = request.getRemoteAddr();
+        String ip   = resolveClientIp(request);
 
         // Rate limit Auth endpoints
         if (path.startsWith("/auth/")) {
@@ -62,5 +68,26 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * Resolves the real client IP when the app runs behind Cloudflare or any other proxy.
+     *
+     * Priority:
+     *  1. CF-Connecting-IP   — set by Cloudflare with the original visitor IP
+     *  2. X-Forwarded-For    — set by standard load-balancers / other proxies
+     *  3. getRemoteAddr()    — fallback for direct connections (local dev)
+     */
+    private String resolveClientIp(HttpServletRequest request) {
+        String cf = request.getHeader("CF-Connecting-IP");
+        if (cf != null && !cf.isBlank()) return cf.trim();
+
+        String xff = request.getHeader("X-Forwarded-For");
+        if (xff != null && !xff.isBlank()) {
+            // X-Forwarded-For may be a comma-separated list: first entry is the real client
+            return xff.split(",")[0].trim();
+        }
+
+        return request.getRemoteAddr();
     }
 }

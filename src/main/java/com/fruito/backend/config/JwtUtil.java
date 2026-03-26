@@ -2,31 +2,57 @@ package com.fruito.backend.config;
 
 import com.fruito.backend.model.Role;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import java.security.*;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 
+/**
+ * JWT utility using EdDSA (Ed25519) asymmetric signing.
+ * Tokens are signed with the private key and verified with the public key.
+ * Keys are injected from environment variables — never hardcoded.
+ */
 @Component
 public class JwtUtil {
 
-    // 🔐 Minimum 256-bit key required for HS256
-    private static final String SECRET =
-            "THIS_IS_A_256_BIT_SECRET_KEY_FOR_HS256_SIGNING_123456";
+    private final long expiration;   // injected from jwt.expiry-ms (e.g. 3600000 = 1h)
+    private final PrivateKey privateKey;
+    private final PublicKey  publicKey;
 
-    private static final long EXPIRATION =
-            1000 * 60 * 60 * 24; // 24 hours
+    public JwtUtil(
+            @Value("${jwt.private-key}") String privateKeyBase64,
+            @Value("${jwt.public-key}")  String publicKeyBase64,
+            @Value("${jwt.expiry-ms}")   long expiration
+    ) {
+        this.expiration = expiration;
+        try {
+            KeyFactory kf = KeyFactory.getInstance("Ed25519");
 
-    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
+            byte[] privBytes = Base64.getDecoder().decode(privateKeyBase64.trim());
+            privateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(privBytes));
+
+            byte[] pubBytes = Base64.getDecoder().decode(publicKeyBase64.trim());
+            publicKey = kf.generatePublic(new X509EncodedKeySpec(pubBytes));
+
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "Failed to load Ed25519 JWT keys from environment — " +
+                    "ensure JWT_PRIVATE_KEY and JWT_PUBLIC_KEY are set correctly.", e);
+        }
+    }
 
     public String generateToken(String email, Role role) {
         return Jwts.builder()
-                .setSubject(email)
+                .subject(email)
                 .claim("role", role.name())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(privateKey)          // JJWT 0.12 auto-selects EdDSA
                 .compact();
     }
 
@@ -48,10 +74,10 @@ public class JwtUtil {
     }
 
     private Claims getClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
+        return Jwts.parser()
+                .verifyWith(publicKey)         // JJWT 0.12 API
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }

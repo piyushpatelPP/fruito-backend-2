@@ -29,6 +29,7 @@ public class FruitService {
         return mapToResponse(fruitRepository.save(fruit));
     }
 
+    @SuppressWarnings("null")
     public FruitResponse update(Long id, FruitRequest request) {
         Fruit fruit = fruitRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Fruit not found"));
@@ -43,16 +44,19 @@ public class FruitService {
         return mapToResponse(fruitRepository.save(fruit));
     }
 
+    @SuppressWarnings("null")
     public void delete(Long id) {
         fruitRepository.deleteById(id);
     }
 
     // USER + ADMIN
+    @SuppressWarnings("null")
     public Page<FruitResponse> getAll(Pageable pageable) {
         return fruitRepository.findAll(pageable)
                 .map(this::mapToResponse);
     }
 
+    @SuppressWarnings("null")
     public FruitResponse getById(Long id) {
         return fruitRepository.findById(id)
                 .map(this::mapToResponse)

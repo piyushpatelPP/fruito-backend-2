@@ -57,7 +57,13 @@ public class CloudinaryService {
 
         try {
             @SuppressWarnings("unchecked")
-            Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            Map<String, Object> uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", "fruito/products",   // organises in Cloudinary dashboard
+                            "resource_type", "auto"        // handles all image types correctly
+                    )
+            );
             return uploadResult.get("secure_url").toString();
         } catch (Exception e) {
             throw new IOException("Cloudinary upload failed", e);

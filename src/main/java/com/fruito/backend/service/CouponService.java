@@ -22,10 +22,12 @@ public class CouponService {
         return couponRepository.findByCode(code);
     }
 
+    @SuppressWarnings("null")
     public Coupon save(Coupon coupon) {
         return couponRepository.save(coupon);
     }
 
+    @SuppressWarnings("null")
     public void delete(Long id) {
         couponRepository.deleteById(id);
     }
