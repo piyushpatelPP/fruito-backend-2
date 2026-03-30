@@ -4,12 +4,12 @@ import com.fruito.backend.dto.product.FruitResponse;
 import com.fruito.backend.service.FruitService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+// No class-level @PreAuthorize — GET endpoints are public (guests can browse).
+// The SecurityConfig URL rules still protect all other /user/** routes.
 @RestController
 @RequestMapping("/user/fruits")
-@PreAuthorize("hasAnyRole('USER','ADMIN')")
 public class UserFruitController {
 
     private final FruitService fruitService;

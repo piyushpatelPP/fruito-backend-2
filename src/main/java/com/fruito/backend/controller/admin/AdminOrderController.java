@@ -1,10 +1,10 @@
 package com.fruito.backend.controller.admin;
 
 import com.fruito.backend.dto.order.AdminOrderResponse;
-import com.fruito.backend.model.Order;
 import com.fruito.backend.model.OrderStatus;
 import com.fruito.backend.service.OrderService;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/orders")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminOrderController {
 
     private final OrderService orderService;
@@ -30,9 +31,9 @@ public class AdminOrderController {
 
     /** PUT /admin/orders/{id}/status?status=CONFIRMED */
     @PutMapping("/{id}/status")
-    public Order updateStatus(@PathVariable Long id,
+    public AdminOrderResponse updateStatus(@PathVariable Long id,
                               @RequestParam OrderStatus status) {
-        return orderService.updateStatus(id, status);
+        return orderService.updateStatusAndReturn(id, status);
     }
 
     /**

@@ -22,6 +22,8 @@ public class MeController {
         User user = userService.getCurrentUser();
 
         return Map.of(
+                "id",      user.getId(),
+                "userId",  user.getId(),   // alias for backward-compat
                 "email",   user.getEmail(),
                 "role",    user.getRole().name(),
                 "phone",   user.getPhone()   != null ? user.getPhone()   : "",

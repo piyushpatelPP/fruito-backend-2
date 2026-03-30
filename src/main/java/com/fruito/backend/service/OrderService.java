@@ -202,6 +202,12 @@ public class OrderService {
         return order;
     }
 
+    /** Used by AdminOrderController — returns DTO to avoid lazy-loading serialization errors */
+    public AdminOrderResponse updateStatusAndReturn(Long id, OrderStatus status) {
+        Order order = updateStatus(id, status);
+        return mapToAdminResponse(order);
+    }
+
     private long getUserOrderNumber(Order order) {
         return orderRepo.countByUserBeforeOrder(order.getUser(), order.getId()) + 1;
     }

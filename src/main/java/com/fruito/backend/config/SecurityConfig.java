@@ -89,7 +89,14 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOriginPatterns(List.of("*"));
+        // Explicit allowed origins: production domain + Railway subdomain + local dev
+        config.setAllowedOriginPatterns(List.of(
+                "https://fruito.store",
+                "https://*.fruito.store",
+                "https://*.up.railway.app",
+                "http://localhost:*",
+                "http://127.0.0.1:*"
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

@@ -15,7 +15,9 @@ public class OrderItemResponse {
     }
 
     public Long getId() { return id; }
-    // Renamed from getProduct() to getFruit() so JSON output uses "fruit" matching frontend
+    // Serialized as "fruit" for structured access, and "fruitName" for admin dashboard direct access
     public FruitResponse getFruit() { return fruit; }
+    // Convenience top-level field: AdminDashboard.tsx accesses item.fruitName directly
+    public String getFruitName() { return fruit != null ? fruit.getName() : null; }
     public int getQuantity() { return quantity; }
 }

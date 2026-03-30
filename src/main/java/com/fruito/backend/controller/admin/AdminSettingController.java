@@ -2,10 +2,12 @@ package com.fruito.backend.controller.admin;
 
 import com.fruito.backend.model.Setting;
 import com.fruito.backend.service.SettingService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin/settings")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminSettingController {
     private final SettingService settingService;
 
