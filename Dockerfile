@@ -1,16 +1,15 @@
-# Use correct image (your previous one was wrong)
 FROM eclipse-temurin:21-jdk-jammy
 
 WORKDIR /app
 
-# Copy everything
+# Copy project
 COPY . .
 
-# Give permission to gradlew
+# Give permission
 RUN chmod +x ./gradlew
 
 # Build jar
 RUN ./gradlew clean bootJar --no-daemon
 
-# Run jar dynamically binding to Railway PORT
-CMD ["sh", "-c", "java -jar build/libs/*.jar"]
+# Run correct jar (IMPORTANT)
+CMD ["java", "-jar", "build/libs/fruito-backend-0.0.1-SNAPSHOT.jar"]
