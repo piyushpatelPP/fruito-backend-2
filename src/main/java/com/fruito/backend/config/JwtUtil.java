@@ -34,6 +34,11 @@ public class JwtUtil {
             @Value("${jwt.expiry-ms}")   long expiration
     ) {
         this.expiration = expiration;
+        // DEBUG START
+        System.out.println("PRIVATE KEY STARTS WITH: " + privateKeyPem.substring(0, 30));
+        System.out.println("PUBLIC KEY STARTS WITH: " + publicKeyPem.substring(0, 30));
+        //  DEBUG END
+
         try {
             KeyFactory kf = KeyFactory.getInstance("RSA");
 
