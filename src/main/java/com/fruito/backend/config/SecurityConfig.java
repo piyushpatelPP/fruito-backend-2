@@ -61,7 +61,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/", "/auth/**", "/health", "/uploads/**", "/robots.txt", "/sitemap.xml").permitAll()
+                        .requestMatchers("/", "/auth/**", "/health", "/uploads/**", "/robots.txt", "/sitemap.xml", "/actuator/**").permitAll()
                         // Fruit catalog is public — guests can browse without an account
                         .requestMatchers(HttpMethod.GET, "/user/fruits", "/user/fruits/**").permitAll()
                         // Settings (delivery fee) needed by Cart page before login
