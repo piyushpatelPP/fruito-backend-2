@@ -56,6 +56,12 @@ public class SecurityConfig {
                                 .includeSubDomains(true)
                                 .maxAgeInSeconds(31536000)
                         )
+                        // Cross-Origin-Opener-Policy must be "unsafe-none" (or removed) so
+                        // Google Sign-In's popup can communicate via window.postMessage.
+                        // Setting it to "same-origin" (Spring's default) breaks Google OAuth.
+                        .addHeaderWriter((request, response) ->
+                                response.setHeader("Cross-Origin-Opener-Policy", "unsafe-none")
+                        )
                 )
                 // ──────────────────────────────────────────────────────────
 
