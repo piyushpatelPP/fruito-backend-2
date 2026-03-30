@@ -69,9 +69,10 @@ public class JwtUtil {
      */
     private static byte[] decodePem(String pem) {
         String stripped = pem
+                .replace("\\n", "\n")           // convert literal \n (Railway single-line format) to real newlines
                 .replaceAll("-----BEGIN[^-]*-----", "")
                 .replaceAll("-----END[^-]*-----", "")
-                .replaceAll("\\s+", "");  // remove all whitespace (newlines, spaces, tabs)
+                .replaceAll("\\s+", "");         // strip all whitespace including real newlines
         return Base64.getDecoder().decode(stripped);
     }
 
