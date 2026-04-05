@@ -208,6 +208,15 @@ public class OrderService {
         return mapToAdminResponse(order);
     }
 
+    /** Admin: manually update payment status (e.g. mark COD order as PAID) */
+    @SuppressWarnings("null")
+    public AdminOrderResponse updatePaymentStatusAndReturn(Long id, String paymentStatus) {
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+        order.setPaymentStatus(paymentStatus.toUpperCase());
+        return mapToAdminResponse(order);
+    }
+
     private long getUserOrderNumber(Order order) {
         return orderRepo.countByUserBeforeOrder(order.getUser(), order.getId()) + 1;
     }

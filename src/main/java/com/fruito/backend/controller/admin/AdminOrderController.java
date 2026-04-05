@@ -48,4 +48,14 @@ public class AdminOrderController {
         orderService.setDeliveryDate(id, deliveryAt);
         return ResponseEntity.ok(Map.of("message", "Delivery date updated"));
     }
+
+    /**
+     * PUT /admin/orders/{id}/payment-status?paymentStatus=PAID
+     * Lets admin manually mark a COD order as PAID (or revert to PENDING/FAILED).
+     */
+    @PutMapping("/{id}/payment-status")
+    public AdminOrderResponse updatePaymentStatus(@PathVariable Long id,
+                                                  @RequestParam String paymentStatus) {
+        return orderService.updatePaymentStatusAndReturn(id, paymentStatus);
+    }
 }
