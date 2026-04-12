@@ -154,23 +154,33 @@ public class OrderService {
         return toOrderResponse(saved);
     }
 
-    // ─── Legacy place (kept for backward compatibility) ───────────────────────
+    // ─── COD (Cash on Delivery) order placement ───────────────────────────────
+    /**
+     * POST /user/orders/place — used when payment method is Cash on Delivery.
+     * No Razorpay involved; order is placed immediately with paymentStatus=COD_PENDING.
+     * Admin can later mark it PAID via the admin dashboard.
+     */
     public OrderResponse placeOrder(String email, String couponCode) {
         User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Cart cart = cartService.getOrCreateCart(user);
-        if (cart.getItems().isEmpty()) throw new RuntimeException("Cart is empty");
+        if (cart.getItems().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cart is empty");
+        }
 
         double subtotal = cart.getItems().stream()
                 .mapToDouble(ci -> ci.getProduct().getPrice() * ci.getQuantity())
                 .sum();
 
         double deliveryFee = Double.parseDouble(settingService.getDeliveryFee());
+        // computeDiscount already checks minOrderValue — returns 0 if not met
         double discount = computeDiscount(subtotal, couponCode);
 
         Order order = new Order(user);
         order.setTotalAmount(Math.max(0, subtotal + deliveryFee - discount));
+        order.setPaymentStatus("COD_PENDING");  // distinguishable from online PENDING
+        order.setRazorpayOrderId(null);          // no Razorpay for COD
 
         cart.getItems().forEach(ci ->
                 order.getItems().add(new OrderItem(order, ci.getProduct(), ci.getQuantity()))
