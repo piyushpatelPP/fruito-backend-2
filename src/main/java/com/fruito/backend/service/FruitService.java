@@ -22,6 +22,7 @@ public class FruitService {
         Fruit fruit = new Fruit();
         fruit.setName(request.getName());
         fruit.setPrice(request.getPrice());
+        fruit.setPricePerHalfKg(request.getPricePerHalfKg());
         fruit.setDescription(request.getDescription());
         fruit.setImageUrl(request.getImageUrl());
         fruit.setStock(request.getStock());
@@ -36,6 +37,7 @@ public class FruitService {
 
         fruit.setName(request.getName());
         fruit.setPrice(request.getPrice());
+        fruit.setPricePerHalfKg(request.getPricePerHalfKg());
         fruit.setDescription(request.getDescription());
         fruit.setImageUrl(request.getImageUrl());
         fruit.setStock(request.getStock());
@@ -69,6 +71,7 @@ public class FruitService {
                 fruit.getId(),
                 fruit.getName(),
                 fruit.getPrice(),
+                fruit.getPricePerHalfKg(),
                 fruit.getDescription(),
                 fruit.getImageUrl(),
                 fruit.getStock(),

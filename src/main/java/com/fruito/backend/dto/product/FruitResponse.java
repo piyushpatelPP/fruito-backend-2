@@ -5,16 +5,18 @@ public class FruitResponse {
     private Long id;
     private String name;
     private Double price;
+    private Double pricePerHalfKg;
     private String description;
     private String imageUrl;
     private int stock;
     private String category;
 
-    public FruitResponse(Long id, String name, Double price, String description,
-                         String imageUrl, int stock, String category) {
+    public FruitResponse(Long id, String name, Double price, Double pricePerHalfKg,
+                         String description, String imageUrl, int stock, String category) {
         this.id = id;
         this.name = name;
         this.price = price;
+        this.pricePerHalfKg = pricePerHalfKg;
         this.description = description;
         this.imageUrl = imageUrl;
         this.stock = stock;
@@ -25,6 +27,7 @@ public class FruitResponse {
     public Long getId() { return id; }
     public String getName() { return name; }
     public Double getPrice() { return price; }
+    public Double getPricePerHalfKg() { return pricePerHalfKg; }
     public String getDescription() { return description; }
     public String getImageUrl() { return imageUrl; }
     public int getStock() { return stock; }

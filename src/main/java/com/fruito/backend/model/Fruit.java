@@ -11,6 +11,10 @@ public class Fruit {
 
     private String name;
     private double price;
+
+    @Column(name = "price_per_half_kg")
+    private Double pricePerHalfKg;
+
     private String description;
 
     @Column(name = "stock", columnDefinition = "integer default 0")
@@ -33,6 +37,10 @@ public class Fruit {
 
     public double getPrice() {
         return price;
+    }
+
+    public Double getPricePerHalfKg() {
+        return pricePerHalfKg;
     }
 
     public String getDescription() {
@@ -62,6 +70,10 @@ public class Fruit {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public void setPricePerHalfKg(Double pricePerHalfKg) {
+        this.pricePerHalfKg = pricePerHalfKg;
     }
 
     public void setDescription(String description) {

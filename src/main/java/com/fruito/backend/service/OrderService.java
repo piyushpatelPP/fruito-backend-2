@@ -233,6 +233,7 @@ public class OrderService {
 
     private FruitResponse mapFruit(Fruit fruit) {
         return new FruitResponse(fruit.getId(), fruit.getName(), fruit.getPrice(),
+                fruit.getPricePerHalfKg(),
                 fruit.getDescription(), fruit.getImageUrl(), fruit.getStock(), fruit.getCategory());
     }
 

@@ -13,6 +13,8 @@ public class FruitRequest {
     @Min(0)
     private Double price;
 
+    private Double pricePerHalfKg;
+
     private String description;
     private String imageUrl;
 
@@ -24,6 +26,7 @@ public class FruitRequest {
     // ===== GETTERS =====
     public String getName() { return name; }
     public Double getPrice() { return price; }
+    public Double getPricePerHalfKg() { return pricePerHalfKg; }
     public String getDescription() { return description; }
     public String getImageUrl() { return imageUrl; }
     public int getStock() { return stock; }
@@ -32,6 +35,7 @@ public class FruitRequest {
     // ===== SETTERS =====
     public void setName(String name) { this.name = name; }
     public void setPrice(Double price) { this.price = price; }
+    public void setPricePerHalfKg(Double pricePerHalfKg) { this.pricePerHalfKg = pricePerHalfKg; }
     public void setDescription(String description) { this.description = description; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public void setStock(int stock) { this.stock = stock; }

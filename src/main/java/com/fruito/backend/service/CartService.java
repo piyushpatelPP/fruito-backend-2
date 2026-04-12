@@ -117,6 +117,7 @@ public class CartService {
                                         i.getProduct().getId(),
                                         i.getProduct().getName(),
                                         i.getProduct().getPrice(),
+                                        i.getProduct().getPricePerHalfKg(),
                                         i.getProduct().getDescription(),
                                         i.getProduct().getImageUrl(),
                                         i.getProduct().getStock(),
